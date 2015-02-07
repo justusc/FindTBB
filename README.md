@@ -26,7 +26,7 @@ In addition, FindTBB uses the following environment variables to find the TBB in
 * ```TBBROOT```
 * ```LIBRARY_PATH```
 
-# FindTBB results
+# FindTBB Results
 This module will set the following variables:
 
 * ```TBB_FOUND``` - Set to false, or undefined, if we haven’t found, or don’t want to use TBB.
