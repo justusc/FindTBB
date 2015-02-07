@@ -4,10 +4,9 @@ FindTBB is a [CMake](http://www.cmake.org) find package module for [Intel&reg; T
 # Usage
 The signature of the TBB find module in CMake is:
 ```CMake
-find_package(TBB [major[.minor]] [EXACT]
-             [QUIET] [REQUIRED]
-             [[COMPONENTS] [components...]]
-             [OPTIONAL_COMPONENTS components...]) 
+find_package(TBB [major[.minor]] [EXACT] [QUIET] [REQUIRED]
+             [COMPONENTS [tbbmalloc] [tbb_preview]]
+             [OPTIONAL_COMPONENTS [tbbmalloc] [tbb_preview]]) 
 ```
 where the allowed components are tbbmalloc and tbb_preview.
 
@@ -17,7 +16,7 @@ The following varibiles may be used by the user to specify the install, include,
 * ```TBB_ROOT_DIR``` - The base directory the of TBB installation.
 * ```TBB_INCLUDE_DIR```  - The directory that contains the TBB headers files.
 * ```TBB_LIBRARY``` - The directory that contains the TBB library files.
-* ```TBB_<library>_LIBRARY``` - The path of the TBB the corresponding TBB library. These libraries, if specified, override the corresponding library search results, where <library> may be tbb, tbb_debug, tbbmalloc, tbbmalloc_debug, tbb_preview, or tbb_preview_debug.
+* ```TBB_<library>_LIBRARY``` - The path of the corresponding TBB library. These libraries, if specified, override the corresponding library search results, where <library> may be tbb, tbb_debug, tbbmalloc, tbbmalloc_debug, tbb_preview, or tbb_preview_debug.
 * ```TBB_USE_DEBUG_BUILD``` - The debug version of tbb libraries, if present, will be used instead of the release version.
 
 In addition, FindTBB uses the following environment variables to find the TBB install directory.
