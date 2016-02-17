@@ -107,8 +107,30 @@ if(NOT TBB_FOUND)
   if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(TBB_DEFAULT_SEARCH_DIR "C:/Program Files/Intel/TBB"
                                "C:/Program Files (x86)/Intel/TBB")
-    # TODO: Set the proper suffix paths based on compiler introspection.
-  
+
+    # Set the target architecture
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+      set(TBB_ARCHITECTURE "intel64")
+    else()
+      set(TBB_ARCHITECTURE "ia32")
+    endif()
+
+    # Set the TBB search library path search suffix based on the version of VC
+    if(WINDOWS_STORE)
+      set(TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc11_ui")
+    elseif(MSVC14)
+      set(TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc14")
+    elseif(MSVC12)
+      set(TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc12")
+    elseif(MSVC11)
+      set(TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc11")
+    elseif(MSVC10)
+      set(TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc10")
+    endif()
+
+    # Add the library path search suffix for the VC independent version of TBB
+    list(APPEND TBB_LIB_PATH_SUFFIX "lib/${TBB_ARCHITECTURE}/vc_mt")
+
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # OS X
     set(TBB_DEFAULT_SEARCH_DIR "/opt/intel/tbb")
