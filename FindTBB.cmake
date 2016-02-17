@@ -238,4 +238,8 @@ if(NOT TBB_FOUND)
   
   mark_as_advanced(TBB_INCLUDE_DIRS TBB_LIBRARIES)
 
+  unset(TBB_ARCHITECTURE)
+  unset(TBB_LIB_PATH_SUFFIX)
+  unset(TBB_DEFAULT_SEARCH_DIR)
+
 endif()
