@@ -1,5 +1,5 @@
 # FindTBB Module
-FindTBB is a [CMake](http://www.cmake.org) find package module for [Intel&reg; Thread Building Blocks](https://www.threadingbuildingblocks.org) (TBB).
+FindTBB is a [CMake](http://www.cmake.org) find package module for [Intel&reg; Threading Building Blocks](https://www.threadingbuildingblocks.org) (TBB).
 
 # Usage
 The signature of the TBB find module in CMake is:
