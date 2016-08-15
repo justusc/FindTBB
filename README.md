@@ -5,8 +5,8 @@ FindTBB is a [CMake](http://www.cmake.org) find package module for [Intel&reg; T
 The signature of the TBB find module in CMake is:
 ```CMake
 find_package(TBB [major[.minor]] [EXACT] [QUIET] [REQUIRED]
-             [COMPONENTS [tbbmalloc] [tbb_preview]]
-             [OPTIONAL_COMPONENTS [tbbmalloc] [tbb_preview]]) 
+             [COMPONENTS [tbbmalloc] [tbbmalloc_proxy] [tbb_preview]]
+             [OPTIONAL_COMPONENTS [tbbmalloc] [tbbmalloc_proxy] [tbb_preview]]) 
 ```
 where the allowed components are tbbmalloc and tbb_preview.
 
@@ -34,12 +34,16 @@ This module will set the following variables:
 * ```TBB_VERSION_MAJOR``` - The major version
 * ```TBB_VERSION_MINOR``` - The minor version
 * ```TBB_INTERFACE_VERSION``` - The interface version number defined in tbb/tbb_stddef.h.
-* ```TBB_<library>_LIBRARY_RELEASE``` - The path of the TBB release version of <library>, where <library> may be tbb, tbb_debug, tbbmalloc, tbbmalloc_debug, tbb_preview, or tbb_preview_debug.
-* ```TBB_<library>_LIBRARY_DEGUG``` - The path of the TBB release version of <library>, where <library> may be tbb, tbb_debug, tbbmalloc, tbbmalloc_debug, tbb_preview, or tbb_preview_debug.
+* ```TBB_<library>_LIBRARY_RELEASE``` - The path of the TBB release version of <library>, where <library> may be tbb, tbb_debug, tbbmalloc, tbbmalloc_proxy, or tbb_preview.
+* ```TBB_<library>_LIBRARY_DEGUG``` - The path of the TBB release version of <library>, where <library> may be tbb_debug, tbbmalloc_debug, tbbmalloc_proxy_debug, or tbb_preview_debug.
 
 # Output Variables
 The following varibles should be used to link executables and libraries with TBB:
 
 * ```TBB_INCLUDE_DIRS``` - The include directory for TBB.
 * ```TBB_LIBRARIES``` - The libraries to link against to use TBB.
+* ```TBB_LIBRARIES_RELEASE``` - The release libraries to link against to use TBB.
+* ```TBB_LIBRARIES_DEBUG``` - The debug libraries to link against to use TBB.
 * ```TBB_DEFINITIONS``` - Definitions to use when compiling code that uses TBB.
+* ```TBB_DEFINITIONS_RELEASE``` - Definitions to use when compiling release code that uses TBB.
+* ```TBB_DEFINITIONS_DEBUG``` - Definitions to use when compiling debug code that uses TBB.
