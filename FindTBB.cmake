@@ -138,7 +138,7 @@ if(NOT TBB_FOUND)
     # TODO: Check to see which C++ library is being used by the compiler.
     if(NOT ${CMAKE_SYSTEM_VERSION} VERSION_LESS 13.0)
       # The default C++ library on OS X 10.9 and later is libc++
-      set(TBB_LIB_PATH_SUFFIX "lib/libc++")
+      set(TBB_LIB_PATH_SUFFIX "lib/libc++" "lib")
     else()
       set(TBB_LIB_PATH_SUFFIX "lib")
     endif()
