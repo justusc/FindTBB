@@ -237,11 +237,10 @@ if(NOT TBB_FOUND)
   ##################################
   # Set compile flags
   ##################################
-  
-  if(TBB_tbb_LIBRARY MATCHES "debug")
-    set(TBB_DEFINITIONS "-DTBB_USE_DEBUG=1")
-  endif()
 
+  set(TBB_DEFINITIONS_RELEASE "")
+  set(TBB_DEFINITIONS_DEBUG "-DTBB_USE_DEBUG=1")
+  set(TBB_DEFINITIONS "${TBB_DEFINITIONS_${TBB_BUILD_TYPE}}")
 
   find_package_handle_standard_args(TBB 
       REQUIRED_VARS TBB_INCLUDE_DIRS TBB_LIBRARIES
