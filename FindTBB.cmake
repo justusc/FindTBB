@@ -89,11 +89,15 @@ if(NOT TBB_FOUND)
   ##################################
   
   if(NOT DEFINED TBB_USE_DEBUG_BUILD)
-    if(CMAKE_BUILD_TYPE MATCHES "[Debug|DEBUG|debug|RelWithDebInfo|RELWITHDEBINFO|relwithdebinfo]")
-      set(TBB_USE_DEBUG_BUILD TRUE)
+    if(CMAKE_BUILD_TYPE MATCHES "(Debug|DEBUG|debug|RelWithDebInfo|RELWITHDEBINFO|relwithdebinfo)")
+      set(TBB_BUILD_TYPE DEBUG)
     else()
-      set(TBB_USE_DEBUG_BUILD FALSE)
+      set(TBB_BUILD_TYPE RELEASE)
     endif()
+  elseif(TBB_USE_DEBUG_BUILD)
+    set(TBB_BUILD_TYPE DEBUG)
+  else()
+    set(TBB_BUILD_TYPE RELEASE)
   endif()
   
   ##################################
@@ -164,50 +168,72 @@ if(NOT TBB_FOUND)
       HINTS ${TBB_INCLUDE_DIR} ${TBB_SEARCH_DIR}
       PATHS ${TBB_DEFAULT_SEARCH_DIR}
       PATH_SUFFIXES include)
-  
+
+  ##################################
+  # Set version strings
+  ##################################
+
+  if(TBB_INCLUDE_DIRS)
+    file(READ "${TBB_INCLUDE_DIRS}/tbb/tbb_stddef.h" _tbb_version_file)
+    string(REGEX REPLACE ".*#define TBB_VERSION_MAJOR ([0-9]+).*" "\\1"
+        TBB_VERSION_MAJOR "${_tbb_version_file}")
+    string(REGEX REPLACE ".*#define TBB_VERSION_MINOR ([0-9]+).*" "\\1"
+        TBB_VERSION_MINOR "${_tbb_version_file}")
+    string(REGEX REPLACE ".*#define TBB_INTERFACE_VERSION ([0-9]+).*" "\\1"
+        TBB_INTERFACE_VERSION "${_tbb_version_file}")
+    set(TBB_VERSION "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}")
+  endif()
+
   ##################################
   # Find TBB components
   ##################################
 
-  # Find each component
-  foreach(_comp tbb_preview tbbmalloc tbb)
-    # Search for the libraries
-    find_library(TBB_${_comp}_LIBRARY_RELEASE ${_comp}
-        HINTS ${TBB_LIBRARY} ${TBB_SEARCH_DIR}
-        PATHS ${TBB_DEFAULT_SEARCH_DIR}
-        PATH_SUFFIXES ${TBB_LIB_PATH_SUFFIX})
+  if(TBB_VERSION VERSION_LESS 4.3)
+    set(TBB_SEARCH_COMPOMPONENTS tbb_preview tbbmalloc tbb)
+  else()
+    set(TBB_SEARCH_COMPOMPONENTS tbb_preview tbbmalloc_proxy tbbmalloc tbb)
+  endif()
 
-    find_library(TBB_${_comp}_LIBRARY_DEBUG ${_comp}_debug
-        HINTS ${TBB_LIBRARY} ${TBB_SEARCH_DIR}
-        PATHS ${TBB_DEFAULT_SEARCH_DIR} ENV LIBRARY_PATH
-        PATH_SUFFIXES ${TBB_LIB_PATH_SUFFIX})
-    
-    
-    # Set the library to be used for the component
-    if(NOT TBB_${_comp}_LIBRARY)
-      if(TBB_USE_DEBUG_BUILD AND TBB_${_comp}_LIBRARY_DEBUG)
-        set(TBB_${_comp}_LIBRARY "${TBB_${_comp}_LIBRARY_DEBUG}")
-      elseif(TBB_${_comp}_LIBRARY_RELEASE)
-        set(TBB_${_comp}_LIBRARY "${TBB_${_comp}_LIBRARY_RELEASE}")
-      elseif(TBB_${_comp}_LIBRARY_DEBUG)
-        set(TBB_${_comp}_LIBRARY "${TBB_${_comp}_LIBRARY_DEBUG}")
+  # Find each component
+  foreach(_comp ${TBB_SEARCH_COMPOMPONENTS})
+    if(";${TBB_FIND_COMPONENTS};tbb;" MATCHES ";${_comp};")
+
+      # Search for the libraries
+      find_library(TBB_${_comp}_LIBRARY_RELEASE ${_comp}
+          HINTS ${TBB_LIBRARY} ${TBB_SEARCH_DIR}
+          PATHS ${TBB_DEFAULT_SEARCH_DIR} ENV LIBRARY_PATH
+          PATH_SUFFIXES ${TBB_LIB_PATH_SUFFIX})
+
+      find_library(TBB_${_comp}_LIBRARY_DEBUG ${_comp}_debug
+          HINTS ${TBB_LIBRARY} ${TBB_SEARCH_DIR}
+          PATHS ${TBB_DEFAULT_SEARCH_DIR} ENV LIBRARY_PATH
+          PATH_SUFFIXES ${TBB_LIB_PATH_SUFFIX})
+
+      if(TBB_${_comp}_LIBRARY_DEBUG)
+        list(APPEND TBB_LIBRARIES_DEBUG "${TBB_${_comp}_LIBRARY_DEBUG}")
       endif()
+      if(TBB_${_comp}_LIBRARY_RELEASE)
+        list(APPEND TBB_LIBRARIES_RELEASE "${TBB_${_comp}_LIBRARY_RELEASE}")
+      endif()
+      if(TBB_${_comp}_LIBRARY_${TBB_BUILD_TYPE} AND NOT TBB_${_comp}_LIBRARY)
+        set(TBB_${_comp}_LIBRARY "${TBB_${_comp}_LIBRARY_${TBB_BUILD_TYPE}}")
+      endif()
+
+      if(TBB_${_comp}_LIBRARY AND EXISTS "${TBB_${_comp}_LIBRARY}")
+        set(TBB_${_comp}_FOUND TRUE)
+      else()
+        set(TBB_${_comp}_FOUND FALSE)
+      endif()
+
+      mark_as_advanced(TBB_${_comp}_LIBRARY_RELEASE)
+      mark_as_advanced(TBB_${_comp}_LIBRARY_DEBUG)
+      mark_as_advanced(TBB_${_comp}_LIBRARY)
+
     endif()
-    
-    # Set the TBB library list and component found variables
-    if(TBB_${_comp}_LIBRARY)
-      list(APPEND TBB_LIBRARIES "${TBB_${_comp}_LIBRARY}")
-      set(TBB_${_comp}_FOUND TRUE)
-    else()
-      set(TBB_${_comp}_FOUND FALSE)
-    endif()
-    
-    mark_as_advanced(TBB_${_comp}_LIBRARY_RELEASE)
-    mark_as_advanced(TBB_${_comp}_LIBRARY_DEBUG)
-    mark_as_advanced(TBB_${_comp}_LIBRARY)
-    
   endforeach()
-  
+
+  set(TBB_LIBRARIES "${TBB_LIBRARIES_${TBB_BUILD_TYPE}}")
+
   ##################################
   # Set compile flags
   ##################################
@@ -215,22 +241,8 @@ if(NOT TBB_FOUND)
   if(TBB_tbb_LIBRARY MATCHES "debug")
     set(TBB_DEFINITIONS "-DTBB_USE_DEBUG=1")
   endif()
-  
-  ##################################
-  # Set version strings
-  ##################################
-  
-  if(TBB_INCLUDE_DIRS)
-    file(READ "${TBB_INCLUDE_DIRS}/tbb/tbb_stddef.h" _tbb_version_file)
-    string(REGEX REPLACE ".*#define TBB_VERSION_MAJOR ([0-9]+).*" "\\1"
-            TBB_VERSION_MAJOR "${_tbb_version_file}")
-    string(REGEX REPLACE ".*#define TBB_VERSION_MINOR ([0-9]+).*" "\\1"
-            TBB_VERSION_MINOR "${_tbb_version_file}")
-    string(REGEX REPLACE ".*#define TBB_INTERFACE_VERSION ([0-9]+).*" "\\1"
-            TBB_INTERFACE_VERSION "${_tbb_version_file}")
-    set(TBB_VERSION "${TBB_VERSION_MAJOR}.${TBB_VERSION_MINOR}")
-  endif()
-  
+
+
   find_package_handle_standard_args(TBB 
       REQUIRED_VARS TBB_INCLUDE_DIRS TBB_LIBRARIES
       HANDLE_COMPONENTS
@@ -239,6 +251,7 @@ if(NOT TBB_FOUND)
   mark_as_advanced(TBB_INCLUDE_DIRS TBB_LIBRARIES)
 
   unset(TBB_ARCHITECTURE)
+  unset(TBB_BUILD_TYPE)
   unset(TBB_LIB_PATH_SUFFIX)
   unset(TBB_DEFAULT_SEARCH_DIR)
 
