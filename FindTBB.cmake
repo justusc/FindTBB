@@ -87,6 +87,8 @@
 # * TBB_DEFINITIONS_DEBUG   - Definitions to use when compiling debug code that
 #                             uses TBB.
 #
+# This module will also create the "tbb" target that may be used when building
+# executables and libraries.
 
 include(FindPackageHandleStandardArgs)
 
@@ -233,6 +235,7 @@ if(NOT TBB_FOUND)
         set(TBB_${_comp}_FOUND FALSE)
       endif()
 
+      # Mark internal variables as advanced
       mark_as_advanced(TBB_${_comp}_LIBRARY_RELEASE)
       mark_as_advanced(TBB_${_comp}_LIBRARY_DEBUG)
       mark_as_advanced(TBB_${_comp}_LIBRARY)
@@ -254,7 +257,25 @@ if(NOT TBB_FOUND)
       REQUIRED_VARS TBB_INCLUDE_DIRS TBB_LIBRARIES
       HANDLE_COMPONENTS
       VERSION_VAR TBB_VERSION)
-  
+
+  ##################################
+  # Create targets
+  ##################################
+
+  if(NOT CMAKE_VERSION VERSION_LESS 3.0 AND TBB_FOUND)
+    add_library(tbb INTERFACE)
+    target_include_directories(tbb INTERFACE ${TBB_INCLUDE_DIRS})
+    if(TBB_LIBRARIES_RELEASE AND TBB_LIBRARIES_DEBUG)
+      target_compile_definitions(tbb INTERFACE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:TBB_USE_DEBUG=1>)
+      target_link_libraries(tbb INTERFACE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:${TBB_LIBRARIES_DEBUG}> $<$<OR:$<CONFIG:Release>,$<CONFIG:MinSizeRel>,$<CONFIG:>>:${TBB_LIBRARIES_RELEASE}>)
+    elseif(TBB_LIBRARIES_RELEASE)
+      target_link_libraries(tbb INTERFACE ${TBB_LIBRARIES_RELEASE})
+    else()
+      target_compile_definitions(tbb INTERFACE ${TBB_DEFINITIONS_DEBUG})
+      target_link_libraries(tbb INTERFACE ${TBB_LIBRARIES_DEBUG})
+    endif()
+  endif()
+
   mark_as_advanced(TBB_INCLUDE_DIRS TBB_LIBRARIES)
 
   unset(TBB_ARCHITECTURE)

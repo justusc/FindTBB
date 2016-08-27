@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 project(TestFindTBB)
 
 list(APPEND CMAKE_MODULE_PATH "..")
@@ -23,7 +23,8 @@ message("TBB_INSTALL_DIR = '$ENV{TBB_INSTALL_DIR}'")
 message("TBBROOT         = '$ENV{TBBROOT}'")
 message("LIBRARY_PATH    = '$ENV{LIBRARY_PATH}'")
 
-find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+#find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+find_package(TBB)
 
 
 set(TBB_SEARCH_COMPOMPONENTS tbb_preview tbbmalloc_proxy tbbmalloc tbb)
@@ -49,3 +50,20 @@ message("TBB_LIBRARIES_RELEASE = '${TBB_LIBRARIES_RELEASE}'")
 message("TBB_LIBRARIES_DEBUG = '${TBB_LIBRARIES_DEBUG}'")
 message("TBB_LIBRARIES = '${TBB_LIBRARIES}'")
 message("TBB_DEFINITIONS = '${TBB_DEFINITIONS}'")
+
+
+message("TBB_INCLUDE_DIRS = '${TBB_INCLUDE_DIRS}'")
+message("TBB_LIBRARIES_RELEASE = '${TBB_LIBRARIES_RELEASE}'")
+message("TBB_LIBRARIES_DEBUG = '${TBB_LIBRARIES_DEBUG}'")
+message("TBB_LIBRARIES = '${TBB_LIBRARIES}'")
+message("TBB_DEFINITIONS = '${TBB_DEFINITIONS}'")
+
+add_executable(test_tbb_a test_tbb.cc)
+target_include_directories(test_tbb_a PRIVATE ${TBB_INCLUDE_DIRS})
+target_compile_definitions(test_tbb_a PRIVATE ${TBB_DEFINITIONS})
+target_compile_options(test_tbb_a PRIVATE "-std=c++11")
+target_link_libraries(test_tbb_a ${TBB_LIBRARIES})
+
+add_executable(test_tbb_b test_tbb.cc)
+target_compile_options(test_tbb_b PRIVATE "-std=c++11")
+target_link_libraries(test_tbb_b tbb)

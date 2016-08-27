@@ -12,6 +12,20 @@ where the allowed components are tbbmalloc and tbb_preview.
 
 # Example Project
 
+With CMake 3.0 and later
+
+```CMake
+cmake_minimum_required(VERSION 3.0)
+project(MyProject)
+
+list(APPEND CMAKE_MODULE_PATH "<path to FindTBB module>")
+
+find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+
+add_executable(myapp myapp.cc)
+target_link_libraries(myapp tbb)
+```
+
 With CMake 2.8 and earlier
 
 ```CMake
