@@ -76,9 +76,17 @@
 #
 # The following varibles should be used to build and link with TBB:
 #
-# * TBB_INCLUDE_DIRS - The include directory for TBB.
-# * TBB_LIBRARIES    - The libraries to link against to use TBB.
-# * TBB_DEFINITIONS  - Definitions to use when compiling code that uses TBB.
+# * TBB_INCLUDE_DIRS        - The include directory for TBB.
+# * TBB_LIBRARIES           - The libraries to link against to use TBB.
+# * TBB_LIBRARIES_RELEASE   - The release libraries to link against to use TBB.
+# * TBB_LIBRARIES_DEBUG     - The debug libraries to link against to use TBB.
+# * TBB_DEFINITIONS         - Definitions to use when compiling code that uses
+#                             TBB.
+# * TBB_DEFINITIONS_RELEASE - Definitions to use when compiling release code that
+#                             uses TBB.
+# * TBB_DEFINITIONS_DEBUG   - Definitions to use when compiling debug code that
+#                             uses TBB.
+#
 
 include(FindPackageHandleStandardArgs)
 

@@ -10,6 +10,24 @@ find_package(TBB [major[.minor]] [EXACT] [QUIET] [REQUIRED]
 ```
 where the allowed components are tbbmalloc and tbb_preview.
 
+# Example Project
+
+With CMake 2.8 and earlier
+
+```CMake
+cmake_minimum_required(VERSION 2.8)
+project(MyProject)
+
+list(APPEND CMAKE_MODULE_PATH "<path to FindTBB module>")
+
+find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
+
+add_executable(myapp myapp)
+target_include_directories(myapp PRIVATE ${TBB_INCLUDE_DIRS})
+target_compile_definitions(myapp PRIVATE ${TBB_DEFINITIONS})
+target_link_libraries(myapp ${TBB_LIBRARIES})
+```
+
 # User Variables
 The following varibiles may be used by the user to specify the install, include, and/or library directories of TBB. 
 
