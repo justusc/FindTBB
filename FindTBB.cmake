@@ -267,14 +267,19 @@ if(NOT TBB_FOUND)
     set_target_properties(tbb PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIRS})
     if(TBB_LIBRARIES_RELEASE AND TBB_LIBRARIES_DEBUG)
       set_target_properties(tbb PROPERTIES
-          INTERFACE_COMPILE_DEFINITIONS "$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:TBB_USE_DEBUG=1">
-          INTERFACE_LINK_LIBRARIES "$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:${TBB_LIBRARIES_DEBUG}> $<$<OR:$<CONFIG:Release>,$<CONFIG:MinSizeRel>,$<CONFIG:>>:${TBB_LIBRARIES_RELEASE}>">
+          INTERFACE_COMPILE_DEFINITIONS "$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:TBB_USE_DEBUG=1>"
+          IMPORTED_LOCATION_DEBUG          ${TBB_LIBRARIES_DEBUG}
+          IMPORTED_LOCATION_RELWITHDEBINFO ${TBB_LIBRARIES_DEBUG}
+          IMPORTED_LOCATION_RELEASE        ${TBB_LIBRARIES_RELEASE}
+          IMPORTED_LOCATION_MINSIZEREL     ${TBB_LIBRARIES_RELEASE}
           )
     elseif(TBB_LIBRARIES_RELEASE)
-      target_link_libraries(tbb INTERFACE ${TBB_LIBRARIES_RELEASE})
+      set_target_properties(tbb PROPERTIES IMPORTED_LOCATION ${TBB_LIBRARIES_RELEASE})
     else()
-      target_compile_definitions(tbb INTERFACE ${TBB_DEFINITIONS_DEBUG})
-      target_link_libraries(tbb INTERFACE ${TBB_LIBRARIES_DEBUG})
+      set_target_properties(tbb PROPERTIES
+          INTERFACE_COMPILE_DEFINITIONS "${TBB_DEFINITIONS_DEBUG}"
+          IMPORTED_LOCATION              ${TBB_LIBRARIES_DEBUG}
+          )
     endif()
   endif()
 
