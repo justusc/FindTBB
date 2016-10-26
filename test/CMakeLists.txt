@@ -67,3 +67,17 @@ target_link_libraries(test_tbb_a ${TBB_LIBRARIES})
 add_executable(test_tbb_b test_tbb.cc)
 target_compile_options(test_tbb_b PRIVATE "-std=c++11")
 target_link_libraries(test_tbb_b tbb)
+
+add_library(test_tbb_c test_tbb.cc)
+target_compile_options(test_tbb_c PRIVATE "-std=c++11")
+target_link_libraries(test_tbb_c tbb)
+
+install(TARGETS test_tbb_c
+        EXPORT depends
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        )
+install (EXPORT depends
+  FILE "testfindtbb-depends.cmake"
+  DESTINATION cmake)
