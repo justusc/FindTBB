@@ -263,8 +263,10 @@ if(NOT TBB_FOUND)
   ##################################
 
   if(NOT CMAKE_VERSION VERSION_LESS 3.0 AND TBB_FOUND)
-    add_library(tbb UNKNOWN IMPORTED)
-    set_target_properties(tbb PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${TBB_INCLUDE_DIRS})
+    add_library(tbb SHARED IMPORTED)
+    set_target_properties(tbb PROPERTIES
+          INTERFACE_INCLUDE_DIRECTORIES  ${TBB_INCLUDE_DIRS}
+          IMPORTED_LOCATION              ${TBB_LIBRARIES})
     if(TBB_LIBRARIES_RELEASE AND TBB_LIBRARIES_DEBUG)
       set_target_properties(tbb PROPERTIES
           INTERFACE_COMPILE_DEFINITIONS "$<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:TBB_USE_DEBUG=1>"
