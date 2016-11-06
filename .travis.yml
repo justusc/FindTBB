@@ -1,0 +1,7 @@
+language: cpp
+os: osx
+sudo: false
+before_install:
+- brew update
+- brew outdated tbb cmake || brew upgrade tbb cmake
+script: ./test.sh
