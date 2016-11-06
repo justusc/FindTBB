@@ -1,0 +1,20 @@
+# Config file for the TestFindTbb package
+
+
+@PACKAGE_INIT@
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
+if(NOT TARGET tbb)
+  find_package(TBB @TBB_VERSION@ EXACT REQUIRED)
+endif()
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET sum AND NOT TESTFINDTBB_BINARY_DIR)
+  include("${CMAKE_CURRENT_LIST_DIR}/testfindtbb-targets.cmake")
+endif()
+
+# These are IMPORTED targets created by testfindtbb-targets.cmake
+set(TESTFINDTBB_LIBRARIES sum)
+set_and_check(TEST_TBB_A_EXECUTABLE "${PACKAGE_PREFIX_DIR}/bin/test_tbb_a")
+set_and_check(TEST_TBB_B_EXECUTABLE "${PACKAGE_PREFIX_DIR}/bin/test_tbb_b")

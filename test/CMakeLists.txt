@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
-project(TestFindTBB)
+project(TestFindTBB VERSION 1.0.0 LANGUAGES CXX)
 
-list(APPEND CMAKE_MODULE_PATH "..")
+# Add FindTBB.cmake path file to the module path
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/..")
+
+# Set RPATHS in executables
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+
+# ==============================================================================
+# Print input variables used by FindTBB.cmake
 
 message("CMAKE_SYSTEM_NAME = '${CMAKE_SYSTEM_NAME}'")
 message("CMAKE_BUILD_TYPE  = '${CMAKE_BUILD_TYPE}'")
@@ -26,6 +34,9 @@ message("LIBRARY_PATH    = '$ENV{LIBRARY_PATH}'")
 #find_package(TBB COMPONENTS tbbmalloc tbbmalloc_proxy tbb_preview)
 find_package(TBB)
 
+
+# ==============================================================================
+# Print output variables from FindTBB.cmake
 
 set(TBB_SEARCH_COMPOMPONENTS tbb_preview tbbmalloc_proxy tbbmalloc tbb)
 
@@ -58,26 +69,69 @@ message("TBB_LIBRARIES_DEBUG = '${TBB_LIBRARIES_DEBUG}'")
 message("TBB_LIBRARIES = '${TBB_LIBRARIES}'")
 message("TBB_DEFINITIONS = '${TBB_DEFINITIONS}'")
 
-add_executable(test_tbb_a test_tbb.cc)
+
+# ==============================================================================
+# Test building executables and libraries that use TBB
+
+# Test linking TBB via FindTBB output variables
+add_executable(test_tbb_a test_tbb.cc sum.h sum.cc)
 target_include_directories(test_tbb_a PRIVATE ${TBB_INCLUDE_DIRS})
 target_compile_definitions(test_tbb_a PRIVATE ${TBB_DEFINITIONS})
 target_compile_options(test_tbb_a PRIVATE "-std=c++11")
 target_link_libraries(test_tbb_a ${TBB_LIBRARIES})
 
+# Test linking TBB to a library via the FindTBB target
+add_library(sum SHARED sum.cc sum.h)
+set_target_properties(sum PROPERTIES PUBLIC_HEADER sum.h)
+target_compile_options(sum PUBLIC "-std=c++11")
+target_include_directories(sum PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include/testfindtbb>)
+target_link_libraries(sum tbb)
+
+# Test transitive linking of FindTBB target
 add_executable(test_tbb_b test_tbb.cc)
-target_compile_options(test_tbb_b PRIVATE "-std=c++11")
-target_link_libraries(test_tbb_b tbb)
+target_link_libraries(test_tbb_b sum)
 
-add_library(test_tbb_c test_tbb.cc)
-target_compile_options(test_tbb_c PRIVATE "-std=c++11")
-target_link_libraries(test_tbb_c tbb)
+# Install the test executables
+install(TARGETS test_tbb_a test_tbb_b sum
+    EXPORT testfindtbb COMPONENT testfindtbb
+    RUNTIME        DESTINATION  bin
+    PUBLIC_HEADER  DESTINATION  include/testfindtbb
+    LIBRARY        DESTINATION  lib
+    ARCHIVE        DESTINATION  lib)
 
-install(TARGETS test_tbb_c
-        EXPORT depends
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        )
-install (EXPORT depends
-  FILE "testfindtbb-depends.cmake"
-  DESTINATION cmake)
+
+# ==============================================================================
+# Test exporting targets that depend on TBB
+
+include(CMakePackageConfigHelpers)
+
+# Create the project version file
+write_basic_package_version_file(testfindtbb-config-version.cmake
+    VERSION ${TESTFINDTBB_VERSION}
+    COMPATIBILITY AnyNewerVersion)
+
+# Create the project targets file
+export(EXPORT testfindtbb
+    FILE "${PROJECT_BINARY_DIR}/testfindtbb-targets.cmake")
+
+# Create the project configure file
+configure_package_config_file(cmake/testfindtbb-config.cmake.in
+    "${PROJECT_BINARY_DIR}/testfindtbb-config.cmake"
+     INSTALL_DESTINATION lib/cmake/testfindtbb
+     PATH_VARS CMAKE_INSTALL_PREFIX)
+
+# Install config, version, and target files for the project
+install(EXPORT testfindtbb
+    FILE "testfindtbb-targets.cmake"
+    DESTINATION lib/cmake/testfindtbb
+    COMPONENT testfindtbb)
+install(FILES
+    "${PROJECT_BINARY_DIR}/testfindtbb-config.cmake"
+    "${PROJECT_BINARY_DIR}/testfindtbb-config-version.cmake"
+    "${PROJECT_SOURCE_DIR}/../FindTBB.cmake"
+    DESTINATION "lib/cmake/testfindtbb"
+    COMPONENT testfindtbb)
+
+
