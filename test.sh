@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 set -e
 
@@ -18,7 +18,7 @@ cleanup() {
 
 trap "cleanup; echo '!!ERROR: Test FAILED'; exit 1" ERR SIGHUP SIGINT SIGTERM
 
-CWD=`PWD`
+CWD=`pwd`
 
 echo "\n### Configure test ###\n"
 
