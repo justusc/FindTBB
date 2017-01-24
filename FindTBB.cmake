@@ -291,6 +291,9 @@ if(NOT TBB_FOUND)
           IMPORTED_LOCATION              ${TBB_LIBRARIES_DEBUG}
           )
     endif()
+    set_target_properties(tbb PROPERTIES
+      IMPORTED_NO_SONAME TRUE
+    )
   endif()
 
   mark_as_advanced(TBB_INCLUDE_DIRS TBB_LIBRARIES)
