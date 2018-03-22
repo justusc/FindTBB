@@ -147,7 +147,8 @@ if(NOT TBB_FOUND)
 
   elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # OS X
-    set(TBB_DEFAULT_SEARCH_DIR "/opt/intel/tbb")
+    set(TBB_DEFAULT_SEARCH_DIR "/opt/intel/tbb"
+                               "/usr/local/opt/tbb")
     
     # TODO: Check to see which C++ library is being used by the compiler.
     if(NOT ${CMAKE_SYSTEM_VERSION} VERSION_LESS 13.0)
